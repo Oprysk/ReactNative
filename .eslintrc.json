@@ -1,0 +1,20 @@
+{
+  "parser": "babel-eslint",
+  "extends": ["airbnb", "plugin:prettier/recommended"],
+  "plugins": [
+    "react"
+  ],
+  "env": {
+    "browser": true,
+    "node": true,
+    "jest": true
+  },
+  "rules": {
+    "no-console": "off",
+    "no-nested-ternary": "off",
+    "no-return-assign": ["error", "except-parens"],
+    "no-underscore-dangle": ["error", { "allow": ["__"] }],
+    "import/prefer-default-export": "off",
+    "import/no-default-export": "error"
+  }
+}

@@ -1,0 +1,61 @@
+{
+  "name": "react-native",
+  "version": "1.0.0",
+  "description": "react native app",
+  "main": "src/server.js",
+  "scripts": {
+    "test": "jest",
+    "dev": "nodemon -w src src/server.js",
+    "prettier": "prettier --write \"./src/**/*.js*\"",
+    "eslint": "eslint src",
+    "eslint:fix": "eslint --fix src"
+  },
+  "author": "Viacheslav Oprysk",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "cors": "^2.8.5",
+    "dotenv": "^6.2.0",
+    "express": "^4.16.4",
+    "mongodb": "^2.2.33",
+    "ramda": "^0.26.1",
+    "pre-commit": "^1.2.2",
+    "prom-client": "^11.2.0",
+    "winston": "^3.0.0"
+  },
+  "devDependencies": {
+    "babel-eslint": "^8.2.3",
+    "concurrently": "^3.5.1",
+    "eslint": "^4.19.1",
+    "eslint-config-airbnb": "^16.1.0",
+    "eslint-config-prettier": "^2.9.0",
+    "eslint-plugin-import": "^2.12.0",
+    "eslint-plugin-prettier": "^2.6.0",
+    "eslint-plugin-jsx-a11y": "^6.0.3",
+    "eslint-plugin-react": "^7.8.2",
+    "jest": "^22.4.3",
+    "nodemon": "^1.17.3",
+    "prettier": "^1.13.3"
+  },
+  "jest": {
+    "testURL": "http://localhost/",
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/dist/"
+    ],
+    "collectCoverage": true,
+    "collectCoverageFrom": [
+      "src/**/*.{js,jsx}"
+    ],
+    "coverageDirectory": "coverage",
+    "coverageReporters": [
+      "text",
+      "text-summary",
+      "html"
+    ],
+    "pre-commit": [
+      "test",
+      "eslint"
+    ]
+  }
+}
