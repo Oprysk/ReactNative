@@ -9,7 +9,7 @@ exports.connect = async (url) => {
     return true
   }
   try {
-    state.db = await MongoClient.connect(url)
+    return (state.db = await MongoClient.connect(url))
   } catch (err) {
     return err
   }

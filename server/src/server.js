@@ -7,6 +7,7 @@ const cors = require('cors')
 const bodyParser = require('body-parser').json()
 
 const db = require('./db')
+
 const app = express()
 
 const corsConfig =
@@ -32,8 +33,25 @@ app.get('/metrics', (req, res) => {
 
 app.post('/users', async (req, res) => {
   try {
-    await db.get().collection('users').insert(req.body)
+    await db
+      .get()
+      .collection('users')
+      .insertOne(req.body)
     res.sendStatus(200)
+  } catch (e) {
+    console.error(e)
+    res.sendStatus(500)
+  }
+})
+
+app.get('/users', async (req, res) => {
+  try {
+    const users = await db
+      .get()
+      .collection('users')
+      .find()
+      .toArray()
+    res.send(users)
   } catch (e) {
     console.error(e)
     res.sendStatus(500)
