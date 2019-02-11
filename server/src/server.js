@@ -2,69 +2,60 @@
 require('./env') // env vars setup, do not move me from this place
 const express = require('express')
 const logger = require('./utils/logger')
+const db = require('./db')
+const userRouter = require('./routes/userRoutes')
 const prometheusClient = require('prom-client')
+const cluster = require('cluster')
+const numCPUs = require('os').cpus().length
 const cors = require('cors')
 const bodyParser = require('body-parser').json()
 
-const db = require('./db')
-
 const app = express()
 
-const corsConfig =
-  process.env.USE_CORS === 'true'
-    ? {
-        cors: {
-          origin: process.env.CORS_ORIGIN,
-        },
-      }
-    : { cors: false }
+if (cluster.isMaster) {
+  console.log(`Master ${process.pid} is running`)
+  // Fork workers.
+  for (let i = 0; i < numCPUs; i += 1) {
+    cluster.fork()
+  }
 
-app.use(cors(corsConfig))
-app.use(bodyParser)
+  cluster.on('exit', (worker, code, signal) => {
+    console.log(`worker ${worker.process.pid} died. code = ${code}, signal = ${signal}`)
+  })
+} else {
+  const corsConfig =
+    process.env.USE_CORS === 'true'
+      ? {
+          cors: {
+            origin: process.env.CORS_ORIGIN,
+          },
+        }
+      : { cors: false }
 
-app.get('/status', (_, res) => {
-  res.sendStatus(200)
-})
+  app.use(cors(corsConfig))
+  app.use(bodyParser)
 
-app.get('/metrics', (req, res) => {
-  res.set('Content-Type', prometheusClient.register.contentType)
-  res.end(prometheusClient.register.metrics())
-})
-
-app.post('/users', async (req, res) => {
-  try {
-    await db
-      .get()
-      .collection('users')
-      .insertOne(req.body)
+  app.get('/status', (_, res) => {
     res.sendStatus(200)
-  } catch (e) {
-    console.error(e)
-    res.sendStatus(500)
-  }
-})
+  })
 
-app.get('/users', async (req, res) => {
+  app.get('/metrics', (req, res) => {
+    res.set('Content-Type', prometheusClient.register.contentType)
+    res.end(prometheusClient.register.metrics())
+  })
+
+  prometheusClient.collectDefaultMetrics()
+
+  const { URI } = process.env
+  const { PORT } = process.env
+
   try {
-    const users = await db
-      .get()
-      .collection('users')
-      .find()
-      .toArray()
-    res.send(users)
-  } catch (e) {
-    console.error(e)
-    res.sendStatus(500)
+    db.connect(URI).then(() =>
+      app.listen(PORT, () => logger.info(`Listening on ${PORT || 8001}. Worker ${process.pid} started`)),
+    )
+  } catch (err) {
+    console.error(err)
   }
-})
 
-prometheusClient.collectDefaultMetrics()
-
-const { URI } = process.env
-const { PORT } = process.env
-
-try {
-  db.connect(URI).then(() => app.listen(PORT, () => logger.info(`Listening on ${PORT || 8001}`)))
-} catch (err) {
-  console.error(err)
+  app.use(userRouter)
 }

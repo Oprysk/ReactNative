@@ -17,10 +17,10 @@
     "cors": "^2.8.5",
     "dotenv": "^6.2.0",
     "express": "^4.16.4",
-    "mongodb": "^2.2.33",
-    "ramda": "^0.26.1",
+    "mongoose": "^5.4.11",
     "pre-commit": "^1.2.2",
     "prom-client": "^11.2.0",
+    "ramda": "^0.26.1",
     "winston": "^3.0.0"
   },
   "devDependencies": {

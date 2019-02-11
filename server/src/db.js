@@ -1,4 +1,4 @@
-const { MongoClient } = require('mongodb')
+const mongoose = require('mongoose')
 
 const state = {
   db: null,
@@ -9,10 +9,11 @@ exports.connect = async (url) => {
     return true
   }
   try {
-    return (state.db = await MongoClient.connect(url))
+    return (state.db = await mongoose.connect(
+      url,
+      { useNewUrlParser: true },
+    ))
   } catch (err) {
     return err
   }
 }
-
-exports.get = () => state.db
